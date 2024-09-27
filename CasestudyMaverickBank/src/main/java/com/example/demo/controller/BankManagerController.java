@@ -21,6 +21,7 @@ import com.example.demo.domain.ApprovalRequest;
 import com.example.demo.domain.EligibilityResponse;
 import com.example.demo.domain.LoanDetailsResponse;
 import com.example.demo.domain.NewLoan;
+import com.example.demo.domain.Usershow;
 import com.example.demo.service.AccountService;
 import com.example.demo.service.ApprovalRequestService;
 import com.example.demo.service.LoginService;
@@ -43,6 +44,9 @@ public class BankManagerController {
     
     @Autowired
 	private LoginService lservice;
+    
+    @Autowired
+	private UserService uservice;
 	
     //shows every request made to BankManager regarding
     //->Bank account and Loan 
@@ -92,9 +96,9 @@ public class BankManagerController {
 	 
 	 //Checks condition for early loan closing
 	 //Based on that, decides to approve or reject the loan closing 
-	 @GetMapping("/close-loan-details/{loanId}")
-	 public LoanDetailsResponse showDetloan(@PathVariable int loanId) {
-		 return newlservice.getLoanDetForApproval(loanId);
+	 @GetMapping("/close-loan-details/{requestId}")
+	 public LoanDetailsResponse showDetloan(@PathVariable int requestId) {
+		 return newlservice.getLoanDetForApproval(requestId);
 	 }
 	 
 	 @PutMapping("/approve-loan-closing/{requestId}")
@@ -120,6 +124,7 @@ public class BankManagerController {
 	 
 	 
 	 //standard methods
+
     @GetMapping("/showAccounts")
     public List<Account> getAllAccounts() {
         return accountService.getAllAccounts();
@@ -133,6 +138,11 @@ public class BankManagerController {
     @GetMapping("/searchAccounts/{accountNumber}")
     public Account getAccountByNumber(@PathVariable String accountNumber) {
         return accountService.getAccountByNumber(accountNumber);
+    }
+    
+    @GetMapping("/searchuser/{accountNumber}")
+    public Usershow getuserByNumber(@PathVariable String accountNumber) {
+        return uservice.searchuserByaccno(accountNumber);
     }
     
     @GetMapping("/searchloans/{loanId}")

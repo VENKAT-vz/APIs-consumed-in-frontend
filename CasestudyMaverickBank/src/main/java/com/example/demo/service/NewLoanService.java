@@ -146,15 +146,24 @@ public class NewLoanService {
 	  }
 	  
 	 
-	  public LoanDetailsResponse getLoanDetForApproval(int loanId) {
+	  public LoanDetailsResponse getLoanDetForApproval(int requestId) {
 
-		  Optional<NewLoan> optionalLoan = newLoanrepo.findById(loanId);
-		    if (!optionalLoan.isPresent()) {
-		        throw new RuntimeException("Loan with ID " + loanId + " not found.");
-		    }
-
-		    NewLoan loan = optionalLoan.get();
-
+//		  Optional<NewLoan> optionalLoan = newLoanrepo.findById(loanId);
+//		    if (!optionalLoan.isPresent()) {
+//		        throw new RuntimeException("Loan with ID " + loanId + " not found.");
+//		    }
+//
+//		    NewLoan loan = optionalLoan.get();
+		  Optional<ApprovalRequest> optionalapprovalRequest = approvalRequestRepository.findById(requestId);
+			 ApprovalRequest approvalRequest=optionalapprovalRequest.get();
+			 
+		  String loanid=approvalRequest.getActionNeededOn();
+		  Optional<NewLoan> optionalloan = newLoanrepo.findById(Integer.valueOf(loanid));
+		  if (!optionalloan.isPresent()) {
+	          throw new IllegalArgumentException("Loan not found with loanid: " + loanid);
+	      }
+		  
+		  NewLoan loan = optionalloan.get();
 		    Optional<NewLoanList> optionalLoanList = newloanlistrepo.findUsingLoanName(loan.getLoanName());
 		    if (!optionalLoanList.isPresent()) {
 		        throw new RuntimeException("Loan type " + loan.getLoanName() + " not found.");
@@ -164,10 +173,15 @@ public class NewLoanService {
 
 		    double outstandingBalance = loan.getTotalAmount();
 
-		    LocalDate loanApprovedDate = loan.getLoanApprovedDate().toLocalDate();
-		    LocalDate today = LocalDate.now();
+		    Date approvedDate = loan.getLoanApprovedDate();
+		    if (approvedDate == null) {
+		        throw new IllegalArgumentException("Loan approved date is null for loanId: " + loan.getLoanId());
+		    }
+		    LocalDate loanApprovedDate = approvedDate.toLocalDate();
+//		    LocalDate loanApprovedDate = loan.getLoanApprovedDate().toLocalDate();
+//		    LocalDate today = LocalDate.now();
 
-		    Period period = Period.between(loanApprovedDate, today);
+		    Period period = Period.between(loanApprovedDate, loanApprovedDate);
 
 		    int monthsPassed = period.getYears() * 12 + period.getMonths();
 

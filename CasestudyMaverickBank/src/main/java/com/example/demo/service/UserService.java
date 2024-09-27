@@ -31,6 +31,7 @@ public class UserService {
 	private LoginRepository lrepo;
 	
 	
+	
     public String addUser(User user) {
         if (userRepo.existsById(user.getUsername())) {
             return "User with username already exists!";
@@ -77,6 +78,28 @@ public class UserService {
 
     }
 
+    public Usershow searchuserByaccno(String accountNumber) {
+    	User userdet = userRepo.findByAccountno(accountNumber);
+    	Usershow ushow=new Usershow();
+    	ushow.setFirstname(userdet.getFirstname());
+    	ushow.setLastname(userdet.getLastname());
+    	ushow.setAddress(userdet.getAddress());
+    	ushow.setCity(userdet.getCity());
+    	ushow.setContactNumber(userdet.getContactNumber());
+    	ushow.setDateOfBirth(userdet.getDateOfBirth());
+    	ushow.setEmailid(userdet.getEmailid());
+    	ushow.setState(userdet.getState());
+    	ushow.setStatus(userdet.getStatus());
+    	ushow.setUsername(userdet.getUsername());
+    	ushow.setGender(userdet.getGender());
+    	
+    	Login login=lrepo.findByUsername(userdet.getUsername());
+    	ushow.setRole(login.getRole());
+        
+        return ushow;			
+    }
+    
+    
     public Usershow searchUser(String usernameOrEmail) {
         User userdet = userRepo.findByUsername(usernameOrEmail);
         if (userdet == null) 

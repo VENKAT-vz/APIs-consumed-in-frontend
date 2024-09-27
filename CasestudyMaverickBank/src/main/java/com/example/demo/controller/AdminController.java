@@ -33,9 +33,7 @@ import com.example.demo.util.JwtUtil;
 @RequestMapping("/admin")
 @CrossOrigin("http://localhost:4200")
 public class AdminController {
-		
-		@Autowired
-		private UserService userservice;
+
 		
 		@Autowired
 		private UserService service;
@@ -105,18 +103,25 @@ public class AdminController {
 			public String adminAuth(@PathVariable String username,@PathVariable String password) {
 				return lservice.adminauthenticate(username, password);
 			}
+	    
 	    @CrossOrigin("http://localhost:4200")
-		    @PostMapping("/generatetoken")
-		    public String createToken(@RequestBody AuthRequest authRequest) throws Exception {
-		        // Authenticate the user based on username and password
-				authenticationManager.authenticate(
-				        new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
-				);
+	    @PostMapping("/generatetoken")
+	    public String createToken(@RequestBody AuthRequest authRequest) throws Exception {
+	        authenticationManager.authenticate(
+	            new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
+	        );
 
-		        // If authentication is successful, generate the token
-		        final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
-		        return jwtUtil.generateToken(userDetails.getUsername());
-		    }
+	        final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
+
+	        boolean isAdmin = userDetails.getAuthorities().stream()
+	            .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+
+	        if (!isAdmin) {
+	            throw new Exception("User is not authorized to generate the token");
+	        }
+
+	        return jwtUtil.generateToken(userDetails.getUsername());
+	    }
 		 
 	}
 

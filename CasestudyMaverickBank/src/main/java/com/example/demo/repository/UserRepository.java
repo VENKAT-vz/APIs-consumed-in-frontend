@@ -18,6 +18,10 @@ public interface UserRepository extends JpaRepository<User, String>{
     User findByEmailid(String emailid);
     User findByUsername(String username);
   
+
+    
+    @Query("SELECT u FROM User u JOIN Account a ON u.username = a.username WHERE a.accountNumber = :accountNumber")
+    User findByAccountno(@Param("accountNumber") String accountNumber);
 }
 
 
